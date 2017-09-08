@@ -15,17 +15,18 @@ class Trans:
         a, b = sorted([self.source_lang, self.target_lang])
 
         # Load lexicon
-        self.word1_to_idx1, self.idx1_to_word1 = pickle.load(open('outputs/{}-{}/{}.lexicon.pkl'.format(a, b, source_lang), 'rb'))
-        self.word2_to_idx2, self.idx2_to_word2 = pickle.load(open('outputs/{}-{}/{}.lexicon.pkl'.format(a, b, target_lang), 'rb'))
+        self.wx_to_x, self.x_to_wx = pickle.load(open('outputs/{}-{}/{}.lexicon.pkl'.format(a, b, source_lang), 'rb'))
+        self.wy_to_y, self.y_to_wy = pickle.load(open('outputs/{}-{}/{}.lexicon.pkl'.format(a, b, target_lang), 'rb'))
 
         # Load trans dictionary
-        self.idx1_to_idx2s = pickle.load(open('outputs/{}-{}/{}-{}.trans.pkl'.format(a, b, source_lang, target_lang), 'rb'))
+        self.x_to_ys = pickle.load(open('outputs/{}-{}/{}-{}.trans.pkl'.format(a, b, source_lang, target_lang), 'rb'))
 
     def __call__(self, query, top_k=3):
+        if query not in self.wx_to_x:
             return "{} is not found in our database".format(query)
-        elif self.word1_to_idx1[query] not in self.idx1_to_idx2s:
+        elif self.wx_to_x[query] not in self.x_to_ys:
             return "Translation of {} is not found in our database".format(query)
         else:
-            idx2s = self.idx1_to_idx2s[self.word1_to_idx1[query]][:top_k]
-            trans = [self.idx2_to_word2[idx2] for idx2 in idx2s]
+            ys = self.x_to_ys[self.wx_to_x[query]][:top_k]
+            trans = [self.y_to_wy[y] for y in ys]
             return trans
